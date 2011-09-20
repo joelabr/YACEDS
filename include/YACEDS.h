@@ -21,11 +21,16 @@ class YACEDS
   
   private:
     YACE::Chip8 chip8;
+    int background;
+    int current_scale;
+    bool game_loaded;
     bool running;
     
+    void check_input();
     bool init();
     void loop();
     void render();
+    void set_scale(int scale);
   
 };
 
