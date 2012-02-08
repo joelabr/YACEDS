@@ -12,6 +12,21 @@ int main(int argc, char** argv)
   else
     yaceds = new YACEDS();
     
+  /*
+  printf("argc: %i\n", argc);
+  for (int i = 0; i < argc; i++)
+    printf("argv[%i]: %s\n", i, argv[i]);
+  */
+  
+  if (argc > 2)
+    yaceds->read_configuration(argv[2]);
+  else
+  {
+    char filename[] = "config.ini";
+    yaceds->read_configuration(filename);
+  }
+    
+    
   yaceds->run();
   
   if (yaceds)

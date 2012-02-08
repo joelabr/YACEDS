@@ -8,7 +8,6 @@
 #endif
 
 #include <cstdio>
-#include <fstream>
 
 #include "CPU.h"
 
@@ -25,6 +24,7 @@ namespace YACE
       int get_cpu_cycles() {return cpu_cycles;}
       bool get_key(EMU_KEYS key) {return keys[key];}
       const char* get_video() {return (const char*)video;}
+      bool is_sound_playing() { return sound_timer > 0; }
       void load_game(const char* file);
       void reset();
       void run() {while (true) step();}
