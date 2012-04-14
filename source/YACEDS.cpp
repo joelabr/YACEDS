@@ -79,6 +79,8 @@ bool YACEDS::init()
   sound_id = soundPlayPSG(DutyCycle_50, 7500, 127, 64);
   if (!sound_id)
     return false;
+   
+  soundPause(sound_id);
   
   // Initialize console
   consoleDemoInit();
