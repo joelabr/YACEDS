@@ -115,7 +115,7 @@ void YACEDS::loop()
 {
   check_input();
   
-  if (chip8.is_sound_playing())
+  if (chip8.get_sound_timer() > 0)
     soundResume(sound_id);
   else
     soundPause(sound_id);
