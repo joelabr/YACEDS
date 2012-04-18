@@ -18,8 +18,8 @@ include $(DEVKITARM)/ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(shell basename $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source
-INCLUDES	:=	include
+SOURCES		:=	source YACE/src
+INCLUDES	:=	include YACE/include
 DATA		:=	data  
 GRAPHICS	:=	gfx  
 

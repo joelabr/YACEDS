@@ -22,6 +22,8 @@ YACEDS::YACEDS(const char* filename) : chip8(), back_buffer(0), background(-1), 
   {
     chip8.load_game(filename);
     game_loaded = true;
+
+    set_scale(current_scale);
   }
   catch (const char* text)
   {
@@ -59,7 +61,7 @@ void YACEDS::check_input()
   }
   if (keysDown() & KEY_RIGHT)
   {
-    if (current_scale < 2)
+    if (current_scale < (2 >> chip8.get_video_mode()))
       set_scale(++current_scale);
   }
 }
@@ -85,14 +87,14 @@ bool YACEDS::init()
   // Initialize console
   consoleDemoInit();
   
-  background = bgInit(3, BgType_Bmp8, BgSize_B8_128x128, 0, 0);
+  background = bgInit(3, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
   if (background == -1)
   {
     fprintf(stderr, "Failed to create background!\n");
     return false;
   }
   
-  back_buffer = bgGetGfxPtr(background) + 128*128;
+  back_buffer = bgGetGfxPtr(background) + (256 * 256);
   
   set_scale(current_scale);
   
@@ -129,16 +131,20 @@ void YACEDS::loop()
 void YACEDS::render()
 {
   const char* video = chip8.get_video();
+
+  int width = 64 << chip8.get_video_mode();
+  int height = 32 << chip8.get_video_mode();
+  int length = width * height;
   
   // Flush DMA and copy video to back buffer
   DC_FlushAll();
-  for (int i = 0; i < 0x800; i += 64)
-    dmaCopy(&video[i], back_buffer + ((i / 64) * 64), 64);
+  for (int i = 0; i < length; i += width)
+    dmaCopy(&video[i], back_buffer + (i / width) * 128, width);
     
   // Change buffer
   back_buffer = (unsigned short*) bgGetGfxPtr(background);
   
-  if (bgGetMapBase(background) != 4)
+  if (bgGetMapBase(background) == 4)
     bgSetMapBase(background, 0);
   else
     bgSetMapBase(background, 4);
@@ -165,8 +171,11 @@ void YACEDS::set_scale(int scale)
 {
   if (scale >= 0 && scale <= 8)
   {
+    int width = 32 << chip8.get_video_mode();
+    int height = 16 << chip8.get_video_mode();
+
     bgSetScale(background, 1 << (8 - scale), 1 << (8 - scale));
-    bgSetScroll(background, -((256 >> scale) >> 1) + 32, -((192 >> scale) >> 1) + 16);
+    bgSetScroll(background, -((256 >> scale) >> 1) + width, -((192 >> scale) >> 1) + height);
     bgUpdate();
   }
 }
@@ -185,6 +194,7 @@ void YACEDS::read_configuration(char* filename)
     return;
   }
   
+  // DEBUG - Dump contents of configuration file.
   // iniparser_dump(configuration, stderr);
   
   // Set foreground- and background colors
@@ -202,8 +212,8 @@ void YACEDS::read_configuration(char* filename)
   // Set scaling
   int ini_scaling = iniparser_getint(configuration, "general:scaling", 0);
   
-  set_scale(ini_scaling);
-  
+  current_scale = ini_scaling;
+
   iniparser_freedict(configuration);
 }
  

@@ -9,7 +9,7 @@
 #include <cstring>
 #include <dirent.h>
 
-#include "Chip8.h"
+#include "../YACE/include/Chip8.h"
 #include <iniparser.h>
 
 class YACEDS
